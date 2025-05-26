@@ -138,15 +138,13 @@ def convert_html_to_txt(json_file_path, download_dir="downloaded_pages", txt_out
                 br_tag.replace_with('\n')
             
             # Replace common block-level elements with newline characters to simulate line breaks
-            # This is an approximation and might need adjustment based on specific HTML structure
             for tag in soup.find_all(['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'ol', 'ul']):
-                tag.append('\n') # Add a newline after the content of block-level tags
+                if tag.get_text(strip=True) or tag.name in ['p', 'div', 'li']:
+                    tag.append('\n')
 
             body_text = ""
             body_tag = soup.find('body')
             if body_tag:
-                # Use get_text with separator='\n' to ensure text is joined with newlines
-                # and strip=True to clean up excessive whitespace
                 body_text = body_tag.get_text(separator='\n', strip=True)
             else:
                 body_text = soup.get_text(separator='\n', strip=True)
@@ -159,18 +157,76 @@ def convert_html_to_txt(json_file_path, download_dir="downloaded_pages", txt_out
             print(f"Error converting {html_file_path} to TXT: {e}")
     print("--- HTML to TXT Conversion Process Completed ---")
 
+def generate_github_links_json(source_json_file, output_json_dir="github_links_json"):
+    """
+    Processes the source JSON file to replace detailUrl fields with GitHub raw links.
+    """
+    GITHUB_BASE_URL = "https://raw.githubusercontent.com/ToastyBuns3939/CampusHelp/refs/heads/main/Pages/"
+
+    try:
+        with open(source_json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: Source JSON file not found at {source_json_file}")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: Could not decode JSON from {source_json_file}")
+        return
+
+    if "data" not in data or not isinstance(data["data"], list):
+        print("Error: JSON structure invalid. Expected a 'data' array.")
+        return
+
+    os.makedirs(output_json_dir, exist_ok=True)
+    output_file_path = os.path.join(output_json_dir, os.path.basename(source_json_file))
+
+    print(f"\n--- Generating JSON with GitHub links to {output_json_dir} ---")
+
+    modified_data = data.copy() # Create a copy to modify
+
+    for item in modified_data["data"]:
+        base_filename = get_output_filenames(item)
+        new_detail_url = f"{GITHUB_BASE_URL}{base_filename}.txt"
+        item["detailUrl"] = new_detail_url
+        print(f"Updated detailUrl for '{item.get('name', 'N/A')}' to: {new_detail_url}")
+
+    try:
+        with open(output_file_path, 'w', encoding='utf-8') as outfile:
+            json.dump(modified_data, outfile, ensure_ascii=False, indent=4)
+        print(f"Successfully generated new JSON file with GitHub links: {output_file_path}")
+    except Exception as e:
+        print(f"Error writing GitHub links JSON file: {e}")
+
+    print("--- GitHub Link Generation Process Completed ---")
+
+
+def display_menu():
+    """Displays the main menu options."""
+    print("\n--- Web Content Processor Menu ---")
+    print("1. Download HTML Pages")
+    print("2. Convert HTML to TXT Files")
+    print("3. Generate JSON with GitHub Links")
+    print("4. Exit")
+    print("----------------------------------")
+
 if __name__ == "__main__":
-    # --- Configuration ---
     SOURCE_JSON_FILE = "HelpContent.json"
-    DOWNLOAD_HTML = True  # Set to True to download HTML pages
-    CONVERT_TO_TXT = True # Set to True to convert HTML to TXT
+    DOWNLOAD_DIR = "downloaded_pages"
+    TXT_OUTPUT_DIR = "extracted_body_txt"
+    GITHUB_LINKS_JSON_DIR = "github_links_json_output" # New directory for the processed JSON
 
-    # --- Run Processes ---
-    if DOWNLOAD_HTML:
-        download_html_pages(SOURCE_JSON_FILE)
+    while True:
+        display_menu()
+        choice = input("Enter your choice (1, 2, 3, or 4): ").strip()
 
-    if CONVERT_TO_TXT:
-        convert_html_to_txt(SOURCE_JSON_FILE)
-
-    if not DOWNLOAD_HTML and not CONVERT_TO_TXT:
-        print("No operation selected. Set DOWNLOAD_HTML or CONVERT_TO_TXT to True.")
+        if choice == '1':
+            download_html_pages(SOURCE_JSON_FILE, DOWNLOAD_DIR)
+        elif choice == '2':
+            convert_html_to_txt(SOURCE_JSON_FILE, DOWNLOAD_DIR, TXT_OUTPUT_DIR)
+        elif choice == '3':
+            generate_github_links_json(SOURCE_JSON_FILE, GITHUB_LINKS_JSON_DIR)
+        elif choice == '4':
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter 1, 2, 3, or 4.")
