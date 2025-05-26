@@ -162,7 +162,7 @@ def generate_github_links_json(source_json_file, output_json_dir="github_links_j
     """
     Processes the source JSON file to replace detailUrl fields with GitHub raw links.
     """
-    GITHUB_BASE_URL = "https://raw.githubusercontent.com/ToastyBuns3939/CampusHelp/refs/heads/main/Pages/"
+    GITHUB_BASE_URL = "https://toastybuns3939.github.io/CampusHelp/Pages/"
 
     try:
         with open(source_json_file, 'r', encoding='utf-8') as f:

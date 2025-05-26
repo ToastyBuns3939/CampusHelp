@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Help - Available Pages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* Increased max-width for better list display */
+            width: 100%;
+        }
+        h1 {
+            font-size: 2rem; /* Slightly larger heading */
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        ul {
+            list-style: none; /* Remove default list bullets */
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            margin-bottom: 15px;
+            background-color: #ecf0f1;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        li:hover {
+            background-color: #dbe4e6;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: block; /* Make the whole list item clickable */
+            text-align: left; /* Align text to the left */
+        }
+        a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Campus Help!</h1>
+        <p>Please select a help topic from the list below:</p>
+        <ul id="pages-list">
+            <!--
+                List your HTML files here.
+                The paths are relative to the root of your GitHub Pages site.
+                For example, if your site is at 'https://<username>.github.io/CampusHelp/',
+                then '/Pages/help-achievement_achievement-achievement_1_Achievements.html'
+                will correctly point to 'https://<username>.github.io/CampusHelp/Pages/help-achievement_achievement_achievement_1_Achievements.html'.
+            -->
+            <li><a href="/Pages/help-achievement_achievement-achievement_1_Achievements.html">Achievements Help</a></li>
+            </ul>
+        <p class="mt-8 text-sm text-gray-500">
+            If you're looking for something specific and don't see it, please check back later!
+        </p>
+    </div>
+</body>
+</html>
