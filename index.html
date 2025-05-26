@@ -42,6 +42,7 @@
             padding: 15px 20px;
             border-radius: 8px;
             transition: background-color 0.3s ease;
+            text-align: left; /* Align text to the left */
         }
         li:hover {
             background-color: #dbe4e6;
@@ -52,11 +53,15 @@
             font-weight: 600;
             font-size: 1.1rem;
             display: block; /* Make the whole list item clickable */
-            text-align: left; /* Align text to the left */
         }
         a:hover {
             color: #2980b9;
             text-decoration: underline;
+        }
+        #loading-message {
+            font-style: italic;
+            color: #666;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -64,19 +69,56 @@
     <div class="container">
         <h1>Welcome to Campus Help!</h1>
         <p>Please select a help topic from the list below:</p>
+        <div id="loading-message">Loading help topics...</div>
         <ul id="pages-list">
-            <!--
-                List your HTML files here.
-                The paths are relative to the root of your GitHub Pages site.
-                For example, if your site is at 'https://<username>.github.io/CampusHelp/',
-                then '/Pages/help-achievement_achievement-achievement_1_Achievements.html'
-                will correctly point to 'https://<username>.github.io/CampusHelp/Pages/help-achievement_achievement_achievement_1_Achievements.html'.
-            -->
-            <li><a href="/Pages/help-achievement_achievement-achievement_1_Achievements.html">Achievements Help</a></li>
             </ul>
         <p class="mt-8 text-sm text-gray-500">
             If you're looking for something specific and don't see it, please check back later!
         </p>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pagesList = document.getElementById('pages-list');
+            const loadingMessage = document.getElementById('loading-message');
+
+            // Define the path to your HelpContent.json file.
+            // Assuming HelpContent.json is in the root of your repository,
+            // and your GitHub Pages is set up for a project site (e.g., yourusername.github.io/CampusHelp/).
+            // If HelpContent.json is in a subfolder, adjust this path.
+            const jsonFilePath = 'HelpContent.json';
+
+            fetch(jsonFilePath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loadingMessage.style.display = 'none'; // Hide loading message
+                    if (data && data.data && Array.isArray(data.data)) {
+                        // Sort the data alphabetically by 'name' for better readability
+                        data.data.sort((a, b) => a.name.localeCompare(b.name));
+
+                        data.data.forEach(item => {
+                            const listItem = document.createElement('li');
+                            const link = document.createElement('a');
+                            link.href = item.detailUrl; // Use the full URL from the JSON
+                            link.textContent = item.name;
+                            listItem.appendChild(link);
+                            pagesList.appendChild(listItem);
+                        });
+                    } else {
+                        pagesList.innerHTML = '<li>No help topics found or data format is incorrect.</li>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching help content:', error);
+                    loadingMessage.textContent = 'Failed to load help topics. Please try again later.';
+                    loadingMessage.style.color = 'red';
+                });
+        });
+    </script>
 </body>
 </html>
