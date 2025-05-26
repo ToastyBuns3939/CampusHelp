@@ -172,6 +172,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-/downloaded_pages
-/extracted_body_txt
-/github_links_json_output
+
