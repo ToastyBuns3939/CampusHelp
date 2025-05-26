@@ -1,8 +1,9 @@
 You can earn achievements by fulfilling various conditions.
- .
+-
 ■ Earning/ranking up achievements
 Each achievement has its own conditions, which can be checked from the details of each achievement. You can earn the achievement by fulfilling the conditions. Some achievements you have earned have further conditions. In that case, the achievement will rank up if you fulfill the conditions.
- 
+～
 ■ Rewards for achieving achievements
 When you earn/rank up an achievement, you can earn rewards such as "Producer Exp" and jewels.
 You can earn achievements by going to each achievement screen after fulfilling the conditions.
+`
