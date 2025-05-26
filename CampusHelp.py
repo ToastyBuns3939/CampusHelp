@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import re
+import time # For adding a small delay between requests
 from bs4 import BeautifulSoup # This library needs to be installed: pip install beautifulsoup4
 
 def sanitize_filename(name):
@@ -157,7 +158,7 @@ def convert_html_to_txt(json_file_path, download_dir="downloaded_pages", txt_out
             print(f"Error converting {html_file_path} to TXT: {e}")
     print("--- HTML to TXT Conversion Process Completed ---")
 
-def generate_github_links_json(source_json_file, output_json_dir="github_links_json"):
+def generate_github_links_json(source_json_file, output_json_dir="github_links_json_output"):
     """
     Processes the source JSON file to replace detailUrl fields with GitHub raw links.
     """
@@ -199,6 +200,61 @@ def generate_github_links_json(source_json_file, output_json_dir="github_links_j
 
     print("--- GitHub Link Generation Process Completed ---")
 
+def validate_github_links(github_json_file_path):
+    """
+    Validates if all detailUrl links in the generated GitHub JSON file are accessible.
+    """
+    try:
+        with open(github_json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: GitHub links JSON file not found at {github_json_file_path}. Please generate it first (Option 3).")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: Could not decode JSON from {github_json_file_path}. Is it a valid JSON file?")
+        return
+
+    if "data" not in data or not isinstance(data["data"], list):
+        print("Error: JSON structure invalid. Expected a 'data' array in the GitHub links JSON.")
+        return
+
+    print(f"\n--- Validating GitHub Links from {github_json_file_path} ---")
+    
+    total_links = len(data["data"])
+    valid_links = 0
+    
+    for i, item in enumerate(data["data"]):
+        link = item.get("detailUrl")
+        item_name = item.get("name", "Unnamed Item")
+        
+        if not link:
+            print(f"[{i+1}/{total_links}] Skipping '{item_name}': No 'detailUrl' found.")
+            continue
+
+        print(f"[{i+1}/{total_links}] Checking: {link}")
+        try:
+            # Use HEAD request for efficiency, fall back to GET if HEAD isn't enough
+            response = requests.head(link, timeout=10) # 10 seconds timeout
+            response.raise_for_status() # Raises HTTPError for bad responses (4xx or 5xx)
+            print(f"  Status: {response.status_code} (OK) - Link is VALID for '{item_name}'")
+            valid_links += 1
+        except requests.exceptions.HTTPError as errh:
+            print(f"  Status: {errh.response.status_code} (HTTP Error) - Link FAILED for '{item_name}': {errh}")
+        except requests.exceptions.ConnectionError as errc:
+            print(f"  Status: Connection Error - Link FAILED for '{item_name}': {errc}")
+        except requests.exceptions.Timeout as errt:
+            print(f"  Status: Timeout - Link FAILED for '{item_name}': {errt}")
+        except requests.exceptions.RequestException as err:
+            print(f"  Status: Other Error - Link FAILED for '{item_name}': {err}")
+        
+        time.sleep(0.1) # Small delay to be polite to the server and avoid hitting rate limits
+
+    print(f"\n--- Link Validation Summary ---")
+    print(f"Total links checked: {total_links}")
+    print(f"Valid links found: {valid_links}")
+    print(f"Invalid/Failed links: {total_links - valid_links}")
+    print("-------------------------------")
+
 
 def display_menu():
     """Displays the main menu options."""
@@ -206,18 +262,22 @@ def display_menu():
     print("1. Download HTML Pages")
     print("2. Convert HTML to TXT Files")
     print("3. Generate JSON with GitHub Links")
-    print("4. Exit")
+    print("4. Validate GitHub Links")
+    print("5. Exit")
     print("----------------------------------")
 
 if __name__ == "__main__":
     SOURCE_JSON_FILE = "HelpContent.json"
     DOWNLOAD_DIR = "downloaded_pages"
     TXT_OUTPUT_DIR = "extracted_body_txt"
-    GITHUB_LINKS_JSON_DIR = "github_links_json_output" # New directory for the processed JSON
+    GITHUB_LINKS_JSON_DIR = "github_links_json_output"
+    # Assuming the validated JSON file will be in the GITHUB_LINKS_JSON_DIR
+    # and have the same name as the source JSON file
+    VALIDATE_JSON_FILE = os.path.join(GITHUB_LINKS_JSON_DIR, os.path.basename(SOURCE_JSON_FILE))
 
     while True:
         display_menu()
-        choice = input("Enter your choice (1, 2, 3, or 4): ").strip()
+        choice = input("Enter your choice (1, 2, 3, 4, or 5): ").strip()
 
         if choice == '1':
             download_html_pages(SOURCE_JSON_FILE, DOWNLOAD_DIR)
@@ -226,7 +286,9 @@ if __name__ == "__main__":
         elif choice == '3':
             generate_github_links_json(SOURCE_JSON_FILE, GITHUB_LINKS_JSON_DIR)
         elif choice == '4':
+            validate_github_links(VALIDATE_JSON_FILE)
+        elif choice == '5':
             print("Exiting the program. Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter 1, 2, 3, or 4.")
+            print("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
