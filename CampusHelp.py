@@ -36,7 +36,7 @@ def get_output_filenames(item):
 def download_html_pages(json_file_path, download_dir="downloaded_pages"):
     """
     Downloads HTML pages from a list of links specified in a JSON file.
-    Skips download if the file already exists.
+    If a file already exists, it checks for differences and updates if necessary.
     """
     try:
         with open(json_file_path, 'r', encoding='utf-8') as f:
@@ -65,20 +65,36 @@ def download_html_pages(json_file_path, download_dir="downloaded_pages"):
         html_filename = base_filename + ".html"
         html_file_path = os.path.join(download_dir, html_filename)
 
-        # Check if file already exists
-        if os.path.exists(html_file_path):
-            print(f"Skipping download for '{html_filename}' as it already exists.")
-            continue # Skip to the next item
+        existing_content = None
+        file_existed = os.path.exists(html_file_path)
+
+        if file_existed:
+            print(f"File '{html_filename}' already exists. Checking for differences...")
+            try:
+                with open(html_file_path, 'rb') as f:
+                    existing_content = f.read()
+            except Exception as e:
+                print(f"Error reading existing file '{html_file_path}': {e}. Proceeding with fresh download.")
+                existing_content = None # Treat as if no existing content
 
         try:
-            print(f"Downloading: {url} to {html_file_path}")
-            response = requests.get(url, stream=True)
+            print(f"Attempting to download latest version of: {url}")
+            response = requests.get(url) # Removed stream=True as we'll read into memory for comparison
             response.raise_for_status()
+            new_content = response.content # Get content as bytes for comparison
 
-            with open(html_file_path, 'wb') as output_file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    output_file.write(chunk)
-            print(f"Successfully downloaded {url}")
+            if file_existed and existing_content is not None and new_content == existing_content:
+                print(f"  No differences found for '{html_filename}'. File is up-to-date.")
+            else:
+                if file_existed and existing_content is not None and new_content != existing_content:
+                    print(f"  Differences found for '{html_filename}'. Updating file.")
+                elif not file_existed:
+                    print(f"  Downloading new file: '{html_filename}'.")
+                
+                with open(html_file_path, 'wb') as output_file:
+                    output_file.write(new_content)
+                print(f"Successfully downloaded/updated '{html_filename}'")
+
         except requests.exceptions.RequestException as e:
             print(f"Error downloading {url}: {e}")
         except Exception as e:
@@ -187,7 +203,7 @@ def generate_github_links_json(source_json_file, output_json_dir="github_links_j
 
     for item in modified_data["data"]:
         base_filename = get_output_filenames(item)
-        new_detail_url = f"{GITHUB_BASE_URL}{base_filename}.txt"
+        new_detail_url = f"{GITHUB_BASE_URL}{base_filename}.html" # Changed to .html as per user's last provided snippet
         item["detailUrl"] = new_detail_url
         print(f"Updated detailUrl for '{item.get('name', 'N/A')}' to: {new_detail_url}")
 
@@ -233,7 +249,6 @@ def validate_github_links(github_json_file_path):
 
         print(f"[{i+1}/{total_links}] Checking: {link}")
         try:
-            # Use HEAD request for efficiency, fall back to GET if HEAD isn't enough
             response = requests.head(link, timeout=10) # 10 seconds timeout
             response.raise_for_status() # Raises HTTPError for bad responses (4xx or 5xx)
             print(f"  Status: {response.status_code} (OK) - Link is VALID for '{item_name}'")
@@ -259,7 +274,7 @@ def validate_github_links(github_json_file_path):
 def display_menu():
     """Displays the main menu options."""
     print("\n--- Web Content Processor Menu ---")
-    print("1. Download HTML Pages")
+    print("1. Download HTML Pages (with difference check)")
     print("2. Convert HTML to TXT Files")
     print("3. Generate JSON with GitHub Links")
     print("4. Validate GitHub Links")
@@ -271,8 +286,6 @@ if __name__ == "__main__":
     DOWNLOAD_DIR = "downloaded_pages"
     TXT_OUTPUT_DIR = "extracted_body_txt"
     GITHUB_LINKS_JSON_DIR = "github_links_json_output"
-    # Assuming the validated JSON file will be in the GITHUB_LINKS_JSON_DIR
-    # and have the same name as the source JSON file
     VALIDATE_JSON_FILE = os.path.join(GITHUB_LINKS_JSON_DIR, os.path.basename(SOURCE_JSON_FILE))
 
     while True:
