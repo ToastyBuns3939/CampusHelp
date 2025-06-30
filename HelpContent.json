@@ -467,7 +467,7 @@
       "id": "idol-dearness",
       "order": 53,
       "name": "Bond",
-      "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/fe5709086c1e09aeb7c6c262b5f0f578d148db6ec1de5d46c0c30df5f62975e1/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
+      "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/7e27f781d0aaee6b304644ec706cefa5e7e8519e5dfb58d7c86a6ca8ad275d10/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
     },
     {
       "helpCategoryId": "help-idol",
@@ -948,9 +948,16 @@
     {
       "helpCategoryId": "help-mission",
       "id": "mission-event",
-      "order": 6,
+      "order": 7,
       "name": "Event Missions",
       "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/46ca8fd39d3001f8ce198cd801fdb8cf7e4f7a9fad2257d0c95d080344cb2702/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
+    },
+    {
+      "helpCategoryId": "help-mission",
+      "id": "mission-idol",
+      "order": 6,
+      "name": "Idol Mission",
+      "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/0d1cdd97bdd1d541ef341e0b8c12b912564c12325016315db96ea693130eff64/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
     },
     {
       "helpCategoryId": "help-mission",
@@ -969,7 +976,7 @@
     {
       "helpCategoryId": "help-mission",
       "id": "mission-pass",
-      "order": 7,
+      "order": 8,
       "name": "Mission Pass",
       "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/20089854976f5844e39ddaa28ec744cf38722cfeb01bca499ab7187259a88d83/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
     },
@@ -1153,7 +1160,7 @@
       "id": "produce-memory-deck-edit",
       "order": 7,
       "name": "Memory Formation (Produce)",
-      "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/be6e5626b75c5b7dc71cf6410f71afac391e3739a0f510f0e5ce067e5028ba6f/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
+      "detailUrl": "https://stat.game-gakuen-idolmaster.jp/html/help/aeb00beba6f62f747b9aff774c773198ac86aedc495724989ac9c0590b9cb3b6/index.html?_cb=c3e6734e2d81779b113c8abea6bbef30b6f45fbaae2362ffcc1bce290abac7a8"
     },
     {
       "helpCategoryId": "help-produce",
